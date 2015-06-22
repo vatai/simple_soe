@@ -21,6 +21,12 @@ void print_table(word_t *p, size_t n){
 }
 
 void soe(size_t nbits, word_t* st){
+void print_ones(word_t *st, size_t nbits){
+  for(size_t i=0; i<nbits; i++) 
+    if(!GET(st,i)) printf("%lu, ", I2P(i));
+  printf("\n");
+}
+
   prime_t p = 2;
   prime_t q = P2I(p);
   
@@ -46,10 +52,7 @@ int main(){
   soe(nbits, st);
   
   print_table(st,n);
-  
-  for(size_t i=0; i<nbits; i++) 
-    if(!GET(st,i)) printf("%lu, ", I2P(i));
-  printf("\n");
+  print_ones(st,nbits);
 
   free(st);
   
