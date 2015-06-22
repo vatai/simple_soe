@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -42,6 +43,23 @@ void soe_init(size_t nbits, word_t* st){
   }
 }
 
+void soe_chunk(size_t nbits,
+	       word_t* st,
+	       size_t chunk_bits, 
+	       word_t** chunk_table, 
+	       size_t chunk_index,
+	       size_t base)
+{
+  word_t* chunk = *(chunk_table + chunk_index);
+}
+
+prime_t next_pime(word_t *st, int reset){
+  static prime_t cur;
+  if(reset) cur = 0;
+  while(!GET(st,cur)) cur;
+  return cur;
+}
+
 int main(){
   printf("Simple Sieve of Eratosthenese\n");
   
@@ -53,7 +71,23 @@ int main(){
   print_table(st,n);
   print_ones(st,nbits);
 
+  /* Initialization of chunks */
+  size_t base = 2048;
+  size_t chunk_size = 4;
+  size_t chunk_bits = chunk_size * sizeof(word_t) * CHAR_BIT;
+  size_t num_chunks = 2;
+  word_t** chunks = (word_t**) malloc(sizeof(*chunks)*num_chunks);
+  word_t* chunk;
+  for(size_t i=0; i<num_chunks; i++) 
+    chunks[i] = (word_t*) calloc(sizeof(*chunks[i]),chunk_size);
+
+  for(size_t i=0; i<num_chunks; i++) 
+    soe_chunk(nbits, st, chunk_bits, chunks, i, base);
+
+  for(size_t i=0; i<num_chunks; i++) free(chunks[i]);
+  free(chunks);
   free(st);
-  
+
+  printf("--- the end ---\n");
   return 0;
 }
