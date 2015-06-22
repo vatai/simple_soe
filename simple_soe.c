@@ -20,13 +20,13 @@ void print_table(word_t *p, size_t n){
   printf("\n");
 }
 
-void soe(size_t nbits, word_t* st){
 void print_ones(word_t *st, size_t nbits){
   for(size_t i=0; i<nbits; i++) 
     if(!GET(st,i)) printf("%lu, ", I2P(i));
   printf("\n");
 }
 
+void soe_init(size_t nbits, word_t* st){
   prime_t p = 2;
   prime_t q = P2I(p);
   
@@ -46,11 +46,10 @@ int main(){
   printf("Simple Sieve of Eratosthenese\n");
   
   size_t n = 4;
+  size_t nbits = n * sizeof(word_t) * CHAR_BIT;
   word_t *st = (word_t*) calloc(sizeof(*st),n);
-  size_t nbits = n*sizeof(*st)*CHAR_BIT;
 
-  soe(nbits, st);
-  
+  soe_init(nbits, st);
   print_table(st,n);
   print_ones(st,nbits);
 
