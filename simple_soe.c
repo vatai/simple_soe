@@ -50,6 +50,7 @@ void soe_init(size_t nbits, word_t* st){
   }
 }
 
+/*** Old soe_chunk ***
 typedef struct chunk_param chunk_param;
 struct chunk_param{
   size_t nbits;
@@ -60,7 +61,6 @@ struct chunk_param{
   size_t base;
 };
 
-/*** Old soe_chunk ***
 void soe_chunk(size_t nbits,
 	       word_t* st,
 	       size_t chunk_bits, 
@@ -72,21 +72,22 @@ void soe_chunk(size_t nbits,
 }
 */
 
-inline size_t negmodp(size_t x, size_t p)
+inline prime_t negmodp2I(prime_t x, prime_t p)
 {
   size_t q = x % p;
-  return q ? p-q : 0;
+  q = q ? p-q : 0;
+  return q % 2 ? P2I(q + p) : P2I( q );
 }
 
 void soe_chunk(size_t nbits, word_t* st, 
 	       size_t chunk_bits, word_t* chunk, 
-	       size_t base)
+	       prime_t base)
 {
   for(size_t i = 1; i < nbits; ++i){ // start from 1 if 1 is in primes
-    if(GET(st,i)){
-      size_t p = I2P(i);
-      size_t q = negmodp(I2P(base),p);
-      q = q % 2 ? P2I(q) : P2I(q + p);
+    if( ! GET(st,i) ){
+      prime_t p = I2P(i);
+      prime_t q = I2P( base );
+      q = negmodp2I( q, p );
       while(q < chunk_bits){
 	SET(chunk, q);
 	q += p;
@@ -98,7 +99,7 @@ void soe_chunk(size_t nbits, word_t* st,
 int main(){
   printf("Simple Sieve of Eratosthenese\n");
   
-  size_t n = 4;
+  size_t n = 1;
   size_t nbits = n * sizeof(word_t) * CHAR_BIT;
   word_t *st = (word_t*) calloc(sizeof(*st),n);
   printf("Last candidate: %lu\n\n", I2P(nbits-1));
@@ -109,8 +110,9 @@ int main(){
 
   /* Initialization of chunks */
   size_t base = 2048;    
-  size_t chunk_size = 4; 
+  size_t chunk_size = 1; 
   size_t chunk_bits = chunk_size * sizeof(word_t) * CHAR_BIT;
+  printf("chunk_bits: %lu\n", chunk_bits);
   word_t* chunk = calloc(chunk_size, sizeof(word_t)); // del this
   soe_chunk(nbits, st, chunk_bits, chunk, base);
   print_primes_chunk(chunk_bits, chunk, base);
@@ -131,5 +133,6 @@ int main(){
   free(st);
 
   printf("--- the end ---\n");
+
   return 0;
 }
