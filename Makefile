@@ -1,1 +1,1 @@
-CFLAGS = -std=c11
+CFLAGS = -std=c11 -O3
