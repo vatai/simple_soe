@@ -50,31 +50,9 @@ void soe_init(size_t nbits, word_t* st){
   }
 }
 
-/*** Old soe_chunk ***
-typedef struct chunk_param chunk_param;
-struct chunk_param{
-  size_t nbits;
-  word_t* st;
-  size_t chunk_bits;
-  word_t** chunk_table;
-  size_t chunk_index;
-  size_t base;
-};
-
-void soe_chunk(size_t nbits,
-	       word_t* st,
-	       size_t chunk_bits, 
-	       word_t** chunk_table, 
-	       size_t chunk_index,
-	       size_t base)
-{
-  word_t* chunk = *(chunk_table + chunk_index);
-}
-*/
-
 inline prime_t negmodp2I(prime_t x, prime_t p)
 {
-  size_t q = x % p;
+  prime_t q = x % p;
   q = q ? p-q : 0;
   return q % 2 ? P2I(q + p) : P2I( q );
 }
@@ -87,6 +65,7 @@ void soe_chunk(size_t nbits, word_t* st,
     if( ! GET(st,i) ){
       prime_t p = I2P(i);
       prime_t q = I2P( base );
+      assert(p<q);
       q = negmodp2I( q, p );
       while(q < chunk_bits){
 	SET(chunk, q);
@@ -99,27 +78,28 @@ void soe_chunk(size_t nbits, word_t* st,
 int main(){
   printf("Simple Sieve of Eratosthenese\n");
   
-  size_t n = 4;
+  size_t log_upper_bound = 13; 
+  size_t n = P2I(1<<(log_upper_bound-LOG_WORD_SIZE));
   size_t nbits = n * sizeof(word_t) * CHAR_BIT;
   word_t *st = (word_t*) calloc(sizeof(*st),n);
   printf("Last candidate: %lu\n\n", I2P(nbits-1));
   
   soe_init(nbits, st);
-  print_table(n, st);
-  print_primes(nbits, st);
+  // print_table(n, st);
+  // print_primes(nbits, st);
 
   /* Initialization of chunks */
-  prime_t base = 2048;    
-  size_t chunk_size = 1; 
+  prime_t base = nbits;
+  size_t log_chunk_upper_bound = 10;
+  size_t chunk_size = 1<<(log_chunk_upper_bound - LOG_WORD_SIZE); 
   size_t chunk_bits = chunk_size * sizeof(word_t) * CHAR_BIT;
 
-  size_t num_chunks = 8;
-  word_t** chunks = (word_t**) malloc(sizeof(*chunks)*num_chunks);
+  size_t num_chunks = 16;
+  word_t** chunks = (word_t**) malloc(sizeof(word_t*)*num_chunks);
   word_t* chunk;
-  
-  for( size_t i = 0; i < num_chunks; ++i ) 
+  for( size_t i = 0; i < num_chunks; ++i ) {
     chunks[i] = (word_t*) calloc( sizeof(word_t), chunk_size);
-
+  }
   prime_t chunk_base = base;
   for( size_t i = 0; i < num_chunks; ++i ) {
     soe_chunk( nbits, st, chunk_bits, chunks[i], chunk_base);
