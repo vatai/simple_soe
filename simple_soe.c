@@ -35,10 +35,10 @@ void print_primes_chunk(size_t nbits, word_t *st, size_t base){
 
 
 void soe_init(size_t nbits, word_t* st){
-  prime_t p = 2;
+  prime_t p = 3;
   prime_t q = P2I(p);
   
-  while(p*p<nbits) {
+  while(p * p < I2P(nbits) ) {
     while(GET(st,q)) q++;
     p = I2P(q);
     prime_t i = P2I(p*p);
