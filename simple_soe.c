@@ -99,7 +99,7 @@ void soe_chunk(size_t nbits, word_t* st,
 int main(){
   printf("Simple Sieve of Eratosthenese\n");
   
-  size_t n = 1;
+  size_t n = 4;
   size_t nbits = n * sizeof(word_t) * CHAR_BIT;
   word_t *st = (word_t*) calloc(sizeof(*st),n);
   printf("Last candidate: %lu\n\n", I2P(nbits-1));
@@ -109,27 +109,26 @@ int main(){
   print_primes(nbits, st);
 
   /* Initialization of chunks */
-  size_t base = 2048;    
+  prime_t base = 2048;    
   size_t chunk_size = 1; 
   size_t chunk_bits = chunk_size * sizeof(word_t) * CHAR_BIT;
-  printf("chunk_bits: %lu\n", chunk_bits);
-  word_t* chunk = calloc(chunk_size, sizeof(word_t)); // del this
-  soe_chunk(nbits, st, chunk_bits, chunk, base);
-  print_primes_chunk(chunk_bits, chunk, base);
 
-  /*************************
-  // Temporarily ignoresd //
-  size_t num_chunks = 2;
+  size_t num_chunks = 8;
   word_t** chunks = (word_t**) malloc(sizeof(*chunks)*num_chunks);
   word_t* chunk;
-  for(size_t i=0; i<num_chunks; i++) 
-  chunks[i] = (word_t*) calloc(sizeof(*chunks[i]),chunk_size);
-  for(size_t i=0; i<num_chunks; i++) 
-  soe_chunk(nbits, st, chunk_bits, chunks, i, base);
-  /************************/
+  
+  for( size_t i = 0; i < num_chunks; ++i ) 
+    chunks[i] = (word_t*) calloc( sizeof(word_t), chunk_size);
 
-  // for(size_t i=0; i<num_chunks; i++) Free(chunks[i]);
-  // free(chunks);
+  prime_t chunk_base = base;
+  for( size_t i = 0; i < num_chunks; ++i ) {
+    soe_chunk( nbits, st, chunk_bits, chunks[i], chunk_base);
+    print_primes_chunk( chunk_bits, chunks[i], chunk_base);
+    chunk_base += chunk_bits;
+  }
+
+  for(size_t i=0; i<num_chunks; i++) free(chunks[i]);
+  free(chunks);
   free(st);
 
   printf("--- the end ---\n");
