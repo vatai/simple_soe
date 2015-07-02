@@ -21,7 +21,7 @@ void print_table(word_t *p, size_t n){
   printf("\n");
 }
 
-void print_ones(word_t *st, size_t nbits){
+void print_primes(word_t *st, size_t nbits){
   for(size_t i=0; i<nbits; i++) 
     if(!GET(st,i)) printf("%lu, ", I2P(i));
   printf("\n");
@@ -69,7 +69,7 @@ int main(){
 
   soe_init(nbits, st);
   print_table(st,n);
-  print_ones(st,nbits);
+  print_primes(st,nbits);
 
   /* Initialization of chunks */
   size_t base = 2048;
