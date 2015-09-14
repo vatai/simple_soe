@@ -1,3 +1,16 @@
+/**
+   This program is a simple implementation of the sieve of
+   Eratosthenese (SOE).  It consists of two stages: 
+   
+   Stage 1: sieving out the "small" primes, i.e. from 0 to some
+   smaller bound 'nbits'.
+   
+   Stage 2: using the primes/sieve table from stage 1, sieve chunks
+   starting from a given base.
+   
+   Here of course, nbits*nbits > base should be true.
+ */
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +28,10 @@ typedef unsigned long word_t;
 #define P2I(p) ((p)>>1) // (((p-2)>>1)) 
 #define I2P(i) (((i)<<1)+1) // ((i)*2+3)
 
+
+/**
+   Print/debug functions.
+*/
 void print_table(size_t n, word_t *p){
   for(size_t i=n; i>0; --i)
     printf("%08lx ",p[i-1]);
@@ -34,6 +51,15 @@ void print_primes_chunk(size_t nbits, word_t *st, size_t base){
 }
 
 
+/**
+   Stage 1: soe_init() implements the sieving of "small" primes.  
+   
+   @param: |nbits| is the *effective* nbits, the number of candidates
+   stored on |nbits| is |I2P(nbits)|.
+   
+   @param: |st| a pointer to the sieve table, with |nbits| number of
+   bits allocated i.e. |nbits/8| bytes.
+ */
 void soe_init(size_t nbits, word_t* st){
   prime_t p = 3;
   prime_t q = P2I(p);
@@ -50,6 +76,10 @@ void soe_init(size_t nbits, word_t* st){
   }
 }
 
+/**
+   negmodp2I() calculates the index of the candidate $-x \bmod p$,
+   taking special care when $-x \bmod p$ is even.
+*/
 inline prime_t negmodp2I(prime_t x, prime_t p)
 {
   prime_t q = x % p;
@@ -57,6 +87,9 @@ inline prime_t negmodp2I(prime_t x, prime_t p)
   return q % 2 ? P2I(q + p) : P2I( q );
 }
 
+/**
+   TODO documentation.
+ */
 void soe_chunk(size_t nbits, word_t* st, 
 	       size_t chunk_bits, word_t* chunk, 
 	       prime_t base)
