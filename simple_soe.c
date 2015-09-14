@@ -1,13 +1,10 @@
 /**
-   This program is a simple implementation of the sieve of
-   Eratosthenese (SOE).  It consists of two stages: 
-   
-   Stage 1: sieving out the "small" primes, i.e. from 0 to some
-   smaller bound 'nbits'.
-   
-   Stage 2: using the primes/sieve table from stage 1, sieve chunks
-   starting from a given base.
-   
+   @file: simple_soe.c This program is a simple implementation of the
+   sieve of Eratosthenes (SOE).  It consists of two stages:
+   - Stage 1: sieving out the "small" primes, i.e. from 0 to some
+     smaller bound 'nbits'.
+   - Stage 2: using the primes/sieve table from stage 1, sieve chunks
+     starting from a given base.
    Here of course, nbits*nbits > base should be true.
  */
 
@@ -54,11 +51,11 @@ void print_primes_chunk(size_t nbits, word_t *st, size_t base){
 /**
    Stage 1: soe_init() implements the sieving of "small" primes.  
    
-   @param: |nbits| is the *effective* nbits, the number of candidates
-   stored on |nbits| is |I2P(nbits)|.
+   @param: `nbits` is the *effective* nbits, the number of candidates
+   stored on `nbits` is `I2P(nbits)`.
    
-   @param: |st| a pointer to the sieve table, with |nbits| number of
-   bits allocated i.e. |nbits/8| bytes.
+   @param: `st` is a pointer to the sieve table, with `nbits` number
+   of bits allocated i.e. `nbits/8` bytes.
  */
 void soe_init(size_t nbits, word_t* st){
   prime_t p = 3;
@@ -77,8 +74,8 @@ void soe_init(size_t nbits, word_t* st){
 }
 
 /**
-   negmodp2I() calculates the index of the candidate $-x \bmod p$,
-   taking special care when $-x \bmod p$ is even.
+   negmodp2I() calculates the index of the candidate \f$-x \bmod p\f$,
+   taking special care when \f$-x \bmod p\f$ is even.
 */
 inline prime_t negmodp2I(prime_t x, prime_t p)
 {
@@ -88,7 +85,20 @@ inline prime_t negmodp2I(prime_t x, prime_t p)
 }
 
 /**
-   TODO documentation.
+   Performs SOE on a chunk with primes read from the sieve table `st`
+   of size `nbits` (effective number bits).  A chunk (at `chunk`) is a
+   chunk of a sieve table of bits from `base` to `base+chunk_bits-1`
+   bits.
+   
+   @param: `nbits` is the effective number of bits stored at `st`.
+   
+   @param: `st` is the pointer to the sieve table.
+   
+   @param: `chunk_bits` is the effective number of bits allocated at
+   `chunk_bits`
+   
+   @param: `base` is the number of bits before the chunk (of course not
+   allocated).
  */
 void soe_chunk(size_t nbits, word_t* st, 
 	       size_t chunk_bits, word_t* chunk, 
@@ -111,6 +121,9 @@ void soe_chunk(size_t nbits, word_t* st,
 int main(){
   printf("Simple Sieve of Eratosthenese\n");
   
+  /**
+     Allocate `st`.
+   */
   size_t log_upper_bound = 13; 
   size_t n = P2I(1<<(log_upper_bound-LOG_WORD_SIZE));
   size_t nbits = n * sizeof(word_t) * CHAR_BIT;
